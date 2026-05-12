@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+
+    <style>
+        body{
+            background-color: rgb(255, 255, 255);
+            font-family: Arial;
+        }
+
+        h1{
+            text-align: center;
+            color: darkgreen;
+        }
+
+        table{
+            margin: auto;
+            border-collapse: collapse;
+            background-color: #8acbfa;
+            width: 700px;
+        }
+
+        td{
+            border: 1px solid black;
+            padding: 10px;
+        }
+
+        input, select, textarea{
+            width: 95%;
+            padding: 5px;
+        }
+
+        .radio{
+            width: auto;
+        }
+
+        .btn{
+            width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Registration Form</h1>
+
+<form>
+
+<table>
+
+    <tr>
+        <td>First Name :</td>
+        <td>
+            <input type="text" placeholder="Enter First Name" required>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Last Name :</td>
+        <td>
+            <input type="text" placeholder="Enter Last Name" required>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Contact No :</td>
+        <td>
+            <input type="tel" placeholder="Enter Contact Number" required>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Landline No :</td>
+        <td>
+            <input type="tel" placeholder="Enter Landline Number">
+        </td>
+    </tr>
+
+    <tr>
+        <td>Email :</td>
+        <td>
+            <input type="email" placeholder="Enter Your Email" required>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Password :</td>
+        <td>
+            <input type="password" placeholder="Enter Password" required>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Date of Birth :</td>
+        <td>
+            <input type="date">
+        </td>
+    </tr>
+
+    <tr>
+        <td>Age :</td>
+        <td>
+            <input type="number" placeholder="Enter Age">
+        </td>
+    </tr>
+
+    <tr>
+        <td>Gender :</td>
+        <td>
+            Male <input type="radio" name="gender" class="radio">
+            Female <input type="radio" name="gender" class="radio">
+        </td>
+    </tr>
+
+    <tr>
+        <td>Address :</td>
+        <td>
+            <textarea rows="4"></textarea>
+        </td>
+    </tr>
+
+    <tr>
+        <td>City :</td>
+        <td>
+            <select>
+                <option>Select City</option>
+                <option>Ahmedabad</option>
+                <option>Surat</option>
+                <option>Rajkot</option>
+                <option>Vadodara</option>
+            </select>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Pincode :</td>
+        <td>
+            <input type="number" placeholder="Enter Pincode">
+        </td>
+    </tr>
+
+    <tr>
+        <td>Joining Date :</td>
+        <td>
+            <input type="date">
+        </td>
+    </tr>
+
+    <tr>
+        <td>Confirm Your Form :</td>
+        <td>
+            <input type="submit" value="Submit" class="btn">
+            <input type="reset" value="Reset" class="btn">
+        </td>
+    </tr>
+
+</table>
+
+</form>
+
+</body>
+</html>
