@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - FoodHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="home.html" class="logo">🍽️ FoodHub</a>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon" title="Cart">🛒</a>
+                <div class="user-auth">
+                    <a href="login.html" class="btn-login">Login</a>
+                    <a href="register.html" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+     <div class="container">
+        <a href="product.html" style="color: var(--primary-color); margin-bottom: 1rem; display: inline-block;">← Back to Products</a>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;" id="product-details">
+            <div class="product-image" style="height: 400px;">
+                <img id="product-image" src="" alt="Product image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+            </div>
+            <div>
+                <h1 id="product-name"></h1>
+                <div id="product-rating" style="font-size: 1.2rem; margin: 1rem 0;"></div>
+                <div id="product-price" style="font-size: 2rem; color: var(--primary-color); font-weight: bold; margin: 1rem 0;"></div>
+                <div id="product-description" style="font-size: 1rem; margin: 1rem 0; line-height: 1.8;"></div>
+                
+                <div style="margin: 2rem 0;">
+                    <label for="quantity" style="font-weight: bold;">Quantity:</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <button id="qty-minus" class="qty-btn">-</button>
+                        <input type="number" id="quantity" value="1" min="1" max="100" class="qty-input">
+                        <button id="qty-plus" class="qty-btn">+</button>
+                    </div>
+                </div>
+
+                <div style="margin: 2rem 0; display: flex; gap: 1rem;">
+                    <button id="add-to-cart-btn" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Add to Cart</button>
+                    <a href="cart.html" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">Go to Cart</a>
+                </div>
+
+                <div style="background-color: #f5f5f5; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
+                    <h3>Product Information</h3>
+                    <p><strong>Category:</strong> <span id="product-category"></span></p>
+                    <p><strong>Availability:</strong> <span style="color: #27ae60;">In Stock</span></p>
+                    <p><strong>Delivery:</strong> Fast delivery available</p>
+                </div>
+            </div>
+        </div>
+
+        <h2 style="text-align: center; margin: 3rem 0;">Related Products</h2>
+        <div class="products-grid" id="related-products"></div>
+    </div>
+
+    <footer></footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+
+       
+        const product = foodWebsite.products.find(p => p.id === productId);
+        const category = foodWebsite.categories.find(c => c.id === product.category);
+
+        if (!product) {
+            document.querySelector('.container').innerHTML = '<h2>Product not found</h2>';
+        } else {
+            
+            document.getElementById('product-name').textContent = product.name;
+            document.getElementById('product-rating').innerHTML = `⭐ ${product.rating} Rating (Based on customer reviews)`;
+            document.getElementById('product-price').textContent = `$${product.price.toFixed(2)}`;
+            document.getElementById('product-description').textContent = product.description;
+            document.getElementById('product-category').textContent = category.name;
+            document.getElementById('product-image').src = product.image;
+            document.getElementById('product-image').alt = product.name;
+
+           
+            let quantity = 1;
+            document.getElementById('qty-minus').addEventListener('click', () => {
+                if (quantity > 1) quantity--;
+                document.getElementById('quantity').value = quantity;
+            });
+
+            document.getElementById('qty-plus').addEventListener('click', () => {
+                quantity++;
+                document.getElementById('quantity').value = quantity;
+            });
+
+            document.getElementById('quantity').addEventListener('change', function() {
+                quantity = Math.max(1, parseInt(this.value) || 1);
+                this.value = quantity;
+            });
+
+            document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+                foodWebsite.addToCart(productId, quantity);
+                quantity = 1;
+                document.getElementById('quantity').value = 1;
+            });
+
+            
+            const relatedProducts = foodWebsite.products
+                .filter(p => p.category === product.category && p.id !== productId)
+                .slice(0, 4);
+
+            const relatedContainer = document.getElementById('related-products');
+            relatedProducts.forEach(relatedProduct => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${relatedProduct.image}" alt="${relatedProduct.name}" style="width:100%; height:100%; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${relatedProduct.name}</div>
+                        <div class="product-description">${relatedProduct.description}</div>
+                        <div class="product-rating">⭐ ${relatedProduct.rating} Rating</div>
+                        <div class="product-price">$${relatedProduct.price.toFixed(2)}</div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary" onclick="foodWebsite.addToCart(${relatedProduct.id}); return false;">Add</button>
+                            <a href="product-details.html?id=${relatedProduct.id}" class="btn btn-secondary">View</a>
+                        </div>
+                    </div>
+                `;
+                relatedContainer.appendChild(productCard);
+            });
+        }
+    </script>
+</body>
+</html>

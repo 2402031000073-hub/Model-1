@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - FoodHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    
+    <header>
+        <div class="header-container">
+            <a href="home.html" class="logo">🍽️ FoodHub</a>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon" title="Cart">🛒</a>
+                <div class="user-auth">
+                    <a href="login.html" class="btn-login">Login</a>
+                    <a href="register.html" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+   
+    <div class="container">
+        <h1 style="text-align: center; margin: 2rem 0;">Browse Our Categories</h1>
+        
+        <div class="category-list" id="all-categories"></div>
+
+        <h2 style="text-align: center; margin: 3rem 0;">Products in this Category</h2>
+        <div class="products-grid" id="category-products"></div>
+    </div>
+
+    
+    <footer></footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+       
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryId = parseInt(urlParams.get('id')) || null;
+
+        
+        const allCategories = document.getElementById('all-categories');
+        foodWebsite.categories.forEach(category => {
+            const categoryCard = document.createElement('div');
+            categoryCard.className = 'category-card';
+            categoryCard.style.cursor = 'pointer';
+            categoryCard.innerHTML = `
+                <div class="category-icon">${category.icon}</div>
+                <div class="category-name">${category.name}</div>
+            `;
+            categoryCard.addEventListener('click', () => {
+                window.location.href = `category.html?id=${category.id}`;
+            });
+            allCategories.appendChild(categoryCard);
+        });
+
+        
+        const categoryProducts = document.getElementById('category-products');
+        const productsInCategory = categoryId 
+            ? foodWebsite.products.filter(p => p.category === categoryId)
+            : foodWebsite.products;
+
+        const categoryName = foodWebsite.categories.find(c => c.id === categoryId)?.name || 'All Products';
+        if (categoryId) {
+            const categoryTitle = document.querySelector('h2');
+            categoryTitle.textContent = `${categoryName} Products`;
+        }
+
+        if (productsInCategory.length === 0) {
+            categoryProducts.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">No products found in this category.</p>';
+        } else {
+            productsInCategory.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-rating">⭐ ${product.rating} Rating</div>
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary" onclick="foodWebsite.addToCart(${product.id}); return false;">Add to Cart</button>
+                            <a href="product-details.html?id=${product.id}" class="btn btn-secondary">View</a>
+                        </div>
+                    </div>
+                `;
+                categoryProducts.appendChild(productCard);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - FoodHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="home.html" class="logo">🍽️ FoodHub</a>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon" title="Cart">🛒</a>
+                <div class="user-auth">
+                    <a href="login.html" class="btn-login">Login</a>
+                    <a href="register.html" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 style="margin-bottom: 2rem;">My Profile</h1>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+          
+            <div>
+                <div style="background-color: white; padding: 2rem; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 1rem;">
+                        👤
+                    </div>
+                    <h2 id="profile-name" style="color: var(--dark-color); margin-bottom: 0.5rem;"></h2>
+                    <p id="profile-email" style="color: #999; margin-bottom: 1.5rem;"></p>
+                    
+                    <a href="order-history.html" class="btn btn-primary" style="width: 100%; text-align: center; display: block; margin-bottom: 0.5rem;">Order History</a>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="logout()">Logout</button>
+                </div>
+
+                <div style="background-color: white; padding: 2rem; border-radius: 8px; margin-top: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Quick Stats</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: #999; font-size: 0.9rem;">Total Orders</p>
+                        <p style="font-weight: bold; font-size: 1.5rem;" id="total-orders">0</p>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: #999; font-size: 0.9rem;">Total Spent</p>
+                        <p style="font-weight: bold; font-size: 1.5rem;" id="total-spent">$0.00</p>
+                    </div>
+                    <div>
+                        <p style="color: #999; font-size: 0.9rem;">Member Since</p>
+                        <p style="font-weight: bold; font-size: 1rem;" id="member-since">Today</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                
+                <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border-color);">
+                    <button class="tab-btn active" onclick="switchTab('personal')">Personal Info</button>
+                    <button class="tab-btn" onclick="switchTab('addresses')">Addresses</button>
+                    <button class="tab-btn" onclick="switchTab('preferences')">Preferences</button>
+                </div>
+
+            
+                <div id="personal" class="tab-content" style="display: block;">
+                    <form id="personalForm" style="background-color: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Personal Information</h3>
+
+                        <div class="form-group">
+                            <label for="full-name">Full Name</label>
+                            <input type="text" id="full-name" name="full-name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" id="phone" name="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" id="dob" name="dob">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <div id="addresses" class="tab-content" style="display: none;">
+                    <div style="background-color: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Saved Addresses</h3>
+
+                        <div id="addresses-list" style="margin-bottom: 2rem;"></div>
+
+                        <button class="btn btn-secondary" onclick="toggleAddressForm()">+ Add New Address</button>
+
+                        <form id="addressForm" style="display: none; margin-top: 2rem; padding: 1.5rem; background-color: #f5f5f5; border-radius: 8px;">
+                            <h4>Add New Address</h4>
+                            
+                            <div class="form-group">
+                                <label for="addr-type">Address Type</label>
+                                <select id="addr-type" name="addr-type">
+                                    <option value="home">Home</option>
+                                    <option value="work">Work</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <input type="text" id="address" name="address" required>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" id="city" name="city" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="zip">ZIP Code</label>
+                                    <input type="text" id="zip" name="zip" required>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="btn btn-primary">Save Address</button>
+                                <button type="button" class="btn btn-secondary" onclick="toggleAddressForm()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+               
+                <div id="preferences" class="tab-content" style="display: none;">
+                    <div style="background-color: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Preferences</h3>
+
+                        <div class="form-group">
+                            <label style="display: flex; gap: 1rem; align-items: center;">
+                                <input type="checkbox" id="notifications" checked>
+                                <span>Receive order notifications via email</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="display: flex; gap: 1rem; align-items: center;">
+                                <input type="checkbox" id="promotions" checked>
+                                <span>Receive promotional offers and deals</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="display: flex; gap: 1rem; align-items: center;">
+                                <input type="checkbox" id="newsletter" checked>
+                                <span>Subscribe to our weekly newsletter</span>
+                            </label>
+                        </div>
+
+                        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">Change Password</h4>
+                            <form id="passwordForm">
+                                <div class="form-group">
+                                    <label for="current-password">Current Password</label>
+                                    <input type="password" id="current-password" name="current-password" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="new-password">New Password</label>
+                                    <input type="password" id="new-password" name="new-password" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirm Password</label>
+                                    <input type="password" id="confirm-password" name="confirm-password" required>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer></footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+        if (!foodWebsite.getCurrentUser()) {
+            document.querySelector('.container').innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <h2>Please login to view your profile</h2>
+                    <a href="login.html" class="btn btn-primary" style="margin-top: 1rem;">Login</a>
+                </div>
+            `;
+        } else {
+            const user = foodWebsite.getCurrentUser();
+            document.getElementById('profile-name').textContent = user.name;
+            document.getElementById('profile-email').textContent = user.email;
+            document.getElementById('full-name').value = user.name;
+            document.getElementById('email').value = user.email;
+
+            
+            const profileData = JSON.parse(localStorage.getItem('foodhub_profile_' + user.email) || '{}');
+            if (profileData.phone) document.getElementById('phone').value = profileData.phone;
+            if (profileData.dob) document.getElementById('dob').value = profileData.dob;
+
+           
+            const orders = foodWebsite.getOrderHistory();
+            document.getElementById('total-orders').textContent = orders.length;
+            const totalSpent = orders.reduce((sum, order) => sum + order.total, 0);
+            document.getElementById('total-spent').textContent = '$' + totalSpent.toFixed(2);
+
+            
+            const users = JSON.parse(localStorage.getItem('foodhub_users') || '[]');
+            const userData = users.find(u => u.email === user.email);
+            if (userData && userData.createdAt) {
+                const date = new Date(userData.createdAt);
+                document.getElementById('member-since').textContent = date.toLocaleDateString();
+            }
+
+            function loadAddresses() {
+                const addresses = JSON.parse(localStorage.getItem('foodhub_addresses_' + user.email) || '[]');
+                const addressesList = document.getElementById('addresses-list');
+                addressesList.innerHTML = '';
+
+                if (addresses.length === 0) {
+                    addressesList.innerHTML = '<p style="color: #999;">No saved addresses yet.</p>';
+                    return;
+                }
+
+                addresses.forEach((addr, index) => {
+                    const addrDiv = document.createElement('div');
+                    addrDiv.style.cssText = 'background-color: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;';
+                    addrDiv.innerHTML = `
+                        <div>
+                            <h4>${addr.type.charAt(0).toUpperCase() + addr.type.slice(1)}</h4>
+                            <p>${addr.address}<br>${addr.city}, ${addr.zip}</p>
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteAddress(${index})">Delete</button>
+                    `;
+                    addressesList.appendChild(addrDiv);
+                });
+            }
+
+            loadAddresses();
+
+            
+            document.getElementById('personalForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const profileData = {
+                    phone: document.getElementById('phone').value,
+                    dob: document.getElementById('dob').value
+                };
+                localStorage.setItem('foodhub_profile_' + user.email, JSON.stringify(profileData));
+                foodWebsite.showNotification('Profile updated successfully!', 'success');
+            });
+
+            document.getElementById('passwordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                const users = JSON.parse(localStorage.getItem('foodhub_users') || '[]');
+                const userIndex = users.findIndex(u => u.email === user.email);
+                
+                if (users[userIndex].password !== currentPassword) {
+                    foodWebsite.showNotification('Current password is incorrect', 'danger');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    foodWebsite.showNotification('New passwords do not match', 'danger');
+                    return;
+                }
+
+                users[userIndex].password = newPassword;
+                localStorage.setItem('foodhub_users', JSON.stringify(users));
+                foodWebsite.showNotification('Password updated successfully!', 'success');
+                document.getElementById('passwordForm').reset();
+            });
+
+            document.getElementById('addressForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const addresses = JSON.parse(localStorage.getItem('foodhub_addresses_' + user.email) || '[]');
+                addresses.push({
+                    type: document.getElementById('addr-type').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    zip: document.getElementById('zip').value
+                });
+                localStorage.setItem('foodhub_addresses_' + user.email, JSON.stringify(addresses));
+                foodWebsite.showNotification('Address added successfully!', 'success');
+                toggleAddressForm();
+                loadAddresses();
+                document.getElementById('addressForm').reset();
+            });
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        function toggleAddressForm() {
+            const form = document.getElementById('addressForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function deleteAddress(index) {
+            const user = foodWebsite.getCurrentUser();
+            if (confirm('Delete this address?')) {
+                const addresses = JSON.parse(localStorage.getItem('foodhub_addresses_' + user.email) || '[]');
+                addresses.splice(index, 1);
+                localStorage.setItem('foodhub_addresses_' + user.email, JSON.stringify(addresses));
+                location.reload();
+            }
+        }
+
+        function logout() {
+            foodWebsite.logout();
+        }
+
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            .tab-btn {
+                background: none;
+                border: none;
+                padding: 1rem 1.5rem;
+                cursor: pointer;
+                color: #666;
+                font-weight: 500;
+                border-bottom: 3px solid transparent;
+                transition: all 0.3s ease;
+            }
+            .tab-btn.active {
+                color: var(--primary-color);
+                border-bottom-color: var(--primary-color);
+            }
+            .tab-btn:hover {
+                color: var(--primary-color);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

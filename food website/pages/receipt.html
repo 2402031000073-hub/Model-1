@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt - FoodHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="home.html" class="logo">🍽️ FoodHub</a>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon" title="Cart">🛒</a>
+                <div class="user-auth">
+                    <a href="login.html" class="btn-login">Login</a>
+                    <a href="register.html" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 2rem;">Order Receipt</h1>
+        <div id="receipt-container" style="background-color: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"></div>
+    </div>
+
+    <footer></footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        function renderReceipt(order) {
+            const receiptContainer = document.getElementById('receipt-container');
+            const orderDate = new Date(order.createdAt).toLocaleString();
+            const paymentText = order.paymentMethod ? order.paymentMethod.replace('-', ' ').toUpperCase() : 'N/A';
+            const delivery = order.deliveryInfo || {};
+
+            let itemsHtml = '';
+            order.items.forEach(item => {
+                itemsHtml += `
+                    <div style="display: grid; grid-template-columns: 80px 1fr auto; gap: 0.75rem; align-items: center; margin-bottom: 1rem; padding: 1rem; background: #fafafa; border-radius: 8px;">
+                        <div style="width: 80px; height: 80px; overflow: hidden; border-radius: 8px;">
+                            <img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit: cover;">
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">${item.name}</div>
+                            <div style="font-size: 0.9rem; color: #666;">Qty: ${item.quantity}</div>
+                        </div>
+                        <div style="text-align:right; font-weight:bold; color: var(--primary-color);">$${(item.price * item.quantity).toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            receiptContainer.innerHTML = `
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="margin-bottom: 0.5rem;">FoodHub Receipt</h2>
+                        <div>Order ID: <strong>${order.id}</strong></div>
+                        <div>Date: <strong>${orderDate}</strong></div>
+                        <div>Status: <strong>${order.status}</strong></div>
+                    </div>
+                    <div style="min-width: 200px; text-align: right;">
+                        <div style="font-size: 1.1rem; color: #666;">Payment Method</div>
+                        <div style="font-weight: 700; font-size: 1.2rem;">${paymentText}</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 0.75rem;">Delivery Information</h3>
+                    <div style="display: grid; gap: 0.5rem; color: #444;">
+                        <div><strong>Name:</strong> ${delivery.fullName || 'N/A'}</div>
+                        <div><strong>Email:</strong> ${delivery.email || 'N/A'}</div>
+                        <div><strong>Phone:</strong> ${delivery.phone || 'N/A'}</div>
+                        <div><strong>Address:</strong> ${delivery.address || 'N/A'}, ${delivery.city || ''} ${delivery.zip || ''}</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 0.75rem;">Order Items</h3>
+                    ${itemsHtml}
+                </div>
+
+                <div style="padding: 1.5rem; background: #f7f7f7; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <span>Subtotal</span>
+                        <span>$${order.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <span>Delivery Fee</span>
+                        <span>$${order.deliveryFee.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <span>Tax</span>
+                        <span>$${order.tax.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: bold; margin-top: 1rem; border-top: 1px solid #ddd; padding-top: 1rem;">
+                        <span>Total</span>
+                        <span>$${order.total.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: flex-end;">
+                    <a href="order-history.html" class="btn btn-secondary">View Order History</a>
+                    <a href="product.html" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            `;
+        }
+
+        function renderReceiptPage() {
+            const orderId = getQueryParam('orderId');
+            const container = document.querySelector('.container');
+
+            if (!foodWebsite.requireLogin()) {
+                container.innerHTML = '<h2>Please login to continue</h2>';
+                return;
+            }
+
+            if (!orderId) {
+                container.innerHTML = '<h2 style="text-align:center; margin:2rem 0;">No receipt available. Please place an order first.</h2>';
+                return;
+            }
+
+            const order = foodWebsite.getOrderById(orderId);
+            if (!order || order.userId !== foodWebsite.getCurrentUser()?.email) {
+                container.innerHTML = '<h2 style="text-align:center; margin:2rem 0;">Receipt not found or access denied.</h2>';
+                return;
+            }
+
+            renderReceipt(order);
+        }
+
+        renderReceiptPage();
+    </script>
+</body>
+</html>

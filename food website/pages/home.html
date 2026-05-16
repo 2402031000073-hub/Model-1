@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodHub - Home</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="home.html" class="logo">🍽️ FoodHub</a>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon" title="Cart">🛒</a>
+                <div class="user-auth">
+                    <a href="login.html" class="btn-login">Login</a>
+                    <a href="register.html" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+  
+    <div class="container">
+        
+        <div class="hero">
+            <div class="hero-copy">
+                <h1>Welcome to FoodHub</h1>
+                <p>Discover the best food from around the world delivered to your door</p>
+                <a href="product.html" class="btn btn-primary">Explore Now</a>
+            </div>
+            <div class="hero-image">
+                <img src="../images/Margherita-Pizza.webp" alt="Delicious food" />
+            </div>
+        </div>
+
+       
+        <h2 style="text-align: center; margin: 2rem 0;">Popular Categories</h2>
+        <div class="category-list" id="categories-container"></div>
+
+      
+        <h2 style="text-align: center; margin: 2rem 0;">Featured Products</h2>
+        <div class="products-grid" id="featured-products"></div>
+    </div>
+
+  
+    <footer></footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+       
+        const categoriesContainer = document.getElementById('categories-container');
+        foodWebsite.categories.forEach(category => {
+            const categoryCard = document.createElement('div');
+            categoryCard.className = 'category-card';
+            categoryCard.innerHTML = `
+                <div class="category-icon">${category.icon}</div>
+                <div class="category-name">${category.name}</div>
+            `;
+            categoryCard.addEventListener('click', () => {
+                window.location.href = `category.html?id=${category.id}`;
+            });
+            categoriesContainer.appendChild(categoryCard);
+        });
+
+       
+        const featuredProducts = document.getElementById('featured-products');
+        foodWebsite.products.slice(0, 6).forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.name}" />
+                </div>
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-description">${product.description}</div>
+                    <div class="product-rating">⭐ ${product.rating} Rating</div>
+                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="foodWebsite.addToCart(${product.id}); return false;">Add to Cart</button>
+                        <a href="product-details.html?id=${product.id}" class="btn btn-secondary">View</a>
+                    </div>
+                </div>
+            `;
+            featuredProducts.appendChild(productCard);
+        });
+    </script>
+</body>
+</html>

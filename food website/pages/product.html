@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - FoodHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="home.html" class="logo">🍽️ FoodHub</a>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon" title="Cart">🛒</a>
+                <div class="user-auth">
+                    <a href="login.html" class="btn-login">Login</a>
+                    <a href="register.html" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 style="text-align: center; margin: 2rem 0;">Our Products</h1>
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <input type="text" id="searchInput" placeholder="Search products..." style="padding: 0.75rem; width: 100%; max-width: 400px; border: 1px solid var(--border-color); border-radius: 4px;">
+        </div>
+
+        <div class="products-grid" id="all-products"></div>
+    </div>
+
+    
+    <footer></footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const allProducts = document.getElementById('all-products');
+        
+        function displayProducts(products) {
+            allProducts.innerHTML = '';
+            if (products.length === 0) {
+                allProducts.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">No products found.</p>';
+                return;
+            }
+
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}" style="width:100%; height:100%; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-rating">⭐ ${product.rating} Rating</div>
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                        <div class="product-actions" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+                            <input type="number" id="qty-${product.id}" class="qty-input" value="1" min="1" style="width: 80px;">
+                            <button class="btn btn-primary" onclick="addProductToCart(${product.id})">Add to Cart</button>
+                            <a href="product-details.html?id=${product.id}" class="btn btn-secondary">View</a>
+                        </div>
+                    </div>
+                `;
+                allProducts.appendChild(productCard);
+            });
+        }
+
+        
+        displayProducts(foodWebsite.products);
+
+        function addProductToCart(productId) {
+            const quantityInput = document.getElementById('qty-' + productId);
+            const qty = Math.max(1, parseInt(quantityInput.value) || 1);
+            foodWebsite.addToCart(productId, qty);
+            quantityInput.value = 1;
+        }
+
+       
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = foodWebsite.products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.description.toLowerCase().includes(searchTerm)
+            );
+            displayProducts(filtered);
+        });
+    </script>
+</body>
+</html>

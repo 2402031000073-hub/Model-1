@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - FoodHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+ 
+    <header>
+        <div class="header-container">
+            <a href="home.html" class="logo">🍽️ FoodHub</a>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon" title="Cart">🛒</a>
+                <div class="user-auth">
+                    <a href="login.html" class="btn-login">Login</a>
+                    <a href="register.html" class="btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    
+    <div class="container">
+        <h1 style="margin-bottom: 2rem;">Shopping Cart</h1>
+        
+        <div class="cart-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <label style="font-weight: bold; color: var(--dark-color);">
+                    <input type="checkbox" id="select-all" checked onchange="toggleSelectAll(this.checked)"> Select All Items
+                </label>
+                <span id="selected-count" style="color: #888;">0 items selected</span>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <p style="text-align: center;">Your cart is empty</p>
+            </div>
+
+            <div class="cart-summary">
+                <h3 style="margin-bottom: 1.5rem;">Order Summary</h3>
+                <div style="margin-bottom: 1rem; color: #444;">Billing for selected items only.</div>
+                
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Delivery Fee:</span>
+                    <span id="delivery">$2.99</span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Tax (10%):</span>
+                    <span id="tax">$0.00</span>
+                </div>
+
+                <div class="summary-item total">
+                    <span>Total:</span>
+                    <span id="total">$0.00</span>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="checkout-btn">Proceed to Checkout</button>
+                <a href="product.html" class="btn btn-secondary" style="width: 100%; text-align: center; margin-top: 1rem; display: block;">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <footer></footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const DELIVERY_FEE = 2.99;
+        const TAX_RATE = 0.10;
+
+        function updateCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+
+            if (foodWebsite.cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p style="text-align: center; color: #999;">Your cart is empty</p>';
+                updateSummary();
+                return;
+            }
+
+            cartItemsContainer.innerHTML = '';
+
+            foodWebsite.cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.style.opacity = item.selected !== false ? '1' : '0.6';
+                cartItem.innerHTML = `
+                    <div style="display: flex; gap: 1rem; align-items: center; width: 100%;">
+                        <label style="display:flex; align-items:center; gap:0.5rem;">
+                            <input type="checkbox" ${item.selected !== false ? 'checked' : ''} onchange="toggleItemSelection(${item.id}, this.checked)">
+                        </label>
+                        <div class="cart-item-image">
+                            <img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div class="cart-item-details" style="flex:1;">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                            <div class="cart-item-quantity">
+                                <button class="qty-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                                <input type="number" class="qty-input" value="${item.quantity}" min="1" onchange="updateQuantity(${item.id}, this.value)">
+                                <button class="qty-btn" onclick="increaseQuantity(${item.id})">+</button>
+                            </div>
+                        </div>
+                        <div style="text-align: right; min-width: 120px;">
+                            <div style="font-weight: bold; color: var(--primary-color); margin-bottom: 1rem;">$${(item.price * item.quantity).toFixed(2)}</div>
+                            <button class="btn btn-danger" style="padding: 0.5rem 1rem;" onclick="removeItem(${item.id})">Remove</button>
+                        </div>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+
+            updateSummary();
+            const selectAll = document.getElementById('select-all');
+            if (selectAll) {
+                selectAll.checked = foodWebsite.cart.length > 0 && foodWebsite.getSelectedCartItems().length === foodWebsite.cart.length;
+            }
+        }
+
+        function updateQuantity(productId, quantity) {
+            foodWebsite.updateQuantity(productId, Math.max(1, parseInt(quantity) || 1));
+            updateCart();
+        }
+
+        function increaseQuantity(productId) {
+            const item = foodWebsite.cart.find(item => item.id === productId);
+            if (item) {
+                foodWebsite.updateQuantity(productId, item.quantity + 1);
+                updateCart();
+            }
+        }
+
+        function decreaseQuantity(productId) {
+            const item = foodWebsite.cart.find(item => item.id === productId);
+            if (item && item.quantity > 1) {
+                foodWebsite.updateQuantity(productId, item.quantity - 1);
+                updateCart();
+            }
+        }
+
+        function removeItem(productId) {
+            if (confirm('Remove this item from cart?')) {
+                foodWebsite.removeFromCart(productId);
+                updateCart();
+            }
+        }
+
+        function updateSummary() {
+            const subtotal = foodWebsite.getSelectedCartTotal();
+            const selectedItems = foodWebsite.getSelectedCartItems();
+            const tax = subtotal * TAX_RATE;
+            const total = subtotal + tax + (selectedItems.length > 0 ? DELIVERY_FEE : 0);
+
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('selected-count').textContent = `${selectedItems.length} item(s) selected`;
+            
+            if (selectedItems.length === 0) {
+                document.getElementById('delivery').textContent = '$0.00';
+            } else {
+                document.getElementById('delivery').textContent = `$${DELIVERY_FEE.toFixed(2)}`;
+            }
+        }
+
+        function toggleItemSelection(productId, selected) {
+            foodWebsite.toggleItemSelection(productId, selected);
+            updateCart();
+        }
+
+        function toggleSelectAll(selected) {
+            foodWebsite.setAllItemSelection(selected);
+            updateCart();
+        }
+
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            if (foodWebsite.getSelectedCartItems().length === 0) {
+                foodWebsite.showNotification('Please select at least one item for billing', 'danger');
+                return;
+            }
+
+            if (!foodWebsite.requireLogin()) {
+                return;
+            }
+
+            window.location.href = 'payment.html';
+        });
+
+       
+        updateCart();
+    </script>
+</body>
+</html>
