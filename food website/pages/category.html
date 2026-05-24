@@ -37,6 +37,68 @@
         <div class="category-list" id="all-categories"></div>
 
         <h2 style="text-align: center; margin: 3rem 0;">Products in this Category</h2>
+        
+        <!-- Filter and Sort Section -->
+        <div class="filter-sort-section">
+            <div class="filter-container">
+                <h3>🔍 Filter</h3>
+                <div class="filter-group">
+                    <label for="price-min">Min Price: $<span id="min-price-display">0</span></label>
+                    <input type="range" id="price-min" min="0" max="15" value="0" step="0.5">
+                </div>
+                <div class="filter-group">
+                    <label for="price-max">Max Price: $<span id="max-price-display">15</span></label>
+                    <input type="range" id="price-max" min="0" max="15" value="15" step="0.5">
+                </div>
+                <div class="filter-group">
+                    <label for="rating-filter">Minimum Rating:</label>
+                    <select id="rating-filter">
+                        <option value="0">All Ratings</option>
+                        <option value="3">⭐ 3+</option>
+                        <option value="4">⭐ 4+</option>
+                        <option value="4.5">⭐ 4.5+</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            </div>
+
+            <div class="sort-container">
+                <h3>📊 Sort</h3>
+                <div class="sort-group">
+                    <label for="sort-option">Sort By:</label>
+                    <select id="sort-option">
+                        <option value="default">Default</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating-high">Rating: High to Low</option>
+                        <option value="rating-low">Rating: Low to High</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-builder" style="margin: 2rem 0;">
+            <h3>Add Custom Radio / Checkbox Options</h3>
+            <div class="option-builder-form">
+                <input type="text" id="option-text" placeholder="Enter option label" aria-label="Option label" />
+                <select id="option-type" aria-label="Option type">
+                    <option value="radio">Radio</option>
+                    <option value="checkbox">Checkbox</option>
+                </select>
+                <button id="add-option-btn" class="btn btn-primary">Add Option</button>
+            </div>
+            <div class="option-groups">
+                <div class="option-group-card">
+                    <h3>Radio Options</h3>
+                    <div id="radio-options" class="option-group"></div>
+                </div>
+                <div class="option-group-card">
+                    <h3>Checkbox Options</h3>
+                    <div id="checkbox-options" class="option-group"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="products-grid" id="category-products"></div>
     </div>
 
@@ -67,7 +129,7 @@
 
         
         const categoryProducts = document.getElementById('category-products');
-        const productsInCategory = categoryId 
+        let productsInCategory = categoryId 
             ? foodWebsite.products.filter(p => p.category === categoryId)
             : foodWebsite.products;
 
@@ -77,30 +139,111 @@
             categoryTitle.textContent = `${categoryName} Products`;
         }
 
-        if (productsInCategory.length === 0) {
-            categoryProducts.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">No products found in this category.</p>';
-        } else {
-            productsInCategory.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                    </div>
-                    <div class="product-info">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-description">${product.description}</div>
-                        <div class="product-rating">⭐ ${product.rating} Rating</div>
-                        <div class="product-price">$${product.price.toFixed(2)}</div>
-                        <div class="product-actions">
-                            <button class="btn btn-primary" onclick="foodWebsite.addToCart(${product.id}); return false;">Add to Cart</button>
-                            <a href="product-details.html?id=${product.id}" class="btn btn-secondary">View</a>
+        // Display products function
+        function displayProducts(products) {
+            categoryProducts.innerHTML = '';
+            if (products.length === 0) {
+                categoryProducts.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">No products found matching your filters.</p>';
+            } else {
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <div class="product-image">
+                            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                         </div>
-                    </div>
-                `;
-                categoryProducts.appendChild(productCard);
-            });
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-description">${product.description}</div>
+                            <div class="product-rating">⭐ ${product.rating} Rating</div>
+                            <div class="product-price">$${product.price.toFixed(2)}</div>
+                            <div class="price-difference">Size: Small base, Medium +$1.50, Large +$3.00</div>
+                            <div class="product-card-size-row">
+                                <label><input type="radio" name="size-option-${product.id}" value="Small" checked> Small</label>
+                                <label><input type="radio" name="size-option-${product.id}" value="Medium"> Medium</label>
+                                <label><input type="radio" name="size-option-${product.id}" value="Large"> Large</label>
+                            </div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary" onclick="addProductToCart(${product.id}); return false;">Add to Cart</button>
+                                <a href="product-details.html?id=${product.id}" class="btn btn-secondary">View</a>
+                            </div>
+                        </div>
+                    `;
+                    categoryProducts.appendChild(productCard);
+                });
+            }
         }
+
+        function addProductToCart(productId) {
+            const selectedSize = document.querySelector(`input[name="size-option-${productId}"]:checked`);
+            const size = selectedSize?.value || 'Small';
+            foodWebsite.addToCart(productId, 1, { size });
+        }
+
+        // Filter and sort logic
+        function applyFiltersAndSort() {
+            let filtered = [...productsInCategory];
+
+            // Apply price filter
+            const minPrice = parseFloat(document.getElementById('price-min').value);
+            const maxPrice = parseFloat(document.getElementById('price-max').value);
+            filtered = filtered.filter(p => p.price >= minPrice && p.price <= maxPrice);
+
+            // Apply rating filter
+            const minRating = parseFloat(document.getElementById('rating-filter').value);
+            if (minRating > 0) {
+                filtered = filtered.filter(p => p.rating >= minRating);
+            }
+
+            // Apply sorting
+            const sortOption = document.getElementById('sort-option').value;
+            switch(sortOption) {
+                case 'price-low':
+                    filtered.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    filtered.sort((a, b) => b.price - a.price);
+                    break;
+                case 'rating-high':
+                    filtered.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'rating-low':
+                    filtered.sort((a, b) => a.rating - b.rating);
+                    break;
+                default:
+                    break;
+            }
+
+            displayProducts(filtered);
+        }
+
+        // Reset filters function
+        function resetFilters() {
+            document.getElementById('price-min').value = 0;
+            document.getElementById('price-max').value = 15;
+            document.getElementById('rating-filter').value = 0;
+            document.getElementById('sort-option').value = 'default';
+            document.getElementById('min-price-display').textContent = '0';
+            document.getElementById('max-price-display').textContent = '15';
+            displayProducts(productsInCategory);
+        }
+
+        // Add event listeners
+        document.getElementById('price-min').addEventListener('input', (e) => {
+            document.getElementById('min-price-display').textContent = e.target.value;
+            applyFiltersAndSort();
+        });
+
+        document.getElementById('price-max').addEventListener('input', (e) => {
+            document.getElementById('max-price-display').textContent = e.target.value;
+            applyFiltersAndSort();
+        });
+
+        document.getElementById('rating-filter').addEventListener('change', applyFiltersAndSort);
+        document.getElementById('sort-option').addEventListener('change', applyFiltersAndSort);
+
+        // Initial display
+        displayProducts(productsInCategory);
     </script>
 </body>
 </html>

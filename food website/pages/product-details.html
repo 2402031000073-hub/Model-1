@@ -87,11 +87,15 @@
             
             document.getElementById('product-name').textContent = product.name;
             document.getElementById('product-rating').innerHTML = `⭐ ${product.rating} Rating (Based on customer reviews)`;
-            document.getElementById('product-price').textContent = `$${product.price.toFixed(2)}`;
+            const priceEl = document.getElementById('product-price');
+            priceEl.textContent = `$${product.price.toFixed(2)}`;
+            // rename price element id so helpers that expect product-price-<id> work
+            priceEl.id = `product-price-${productId}`;
             document.getElementById('product-description').textContent = product.description;
             document.getElementById('product-category').textContent = category.name;
             document.getElementById('product-image').src = product.image;
             document.getElementById('product-image').alt = product.name;
+            document.getElementById('product-price-' + productId)?.parentElement?.insertAdjacentHTML('beforeend', '<div class="price-difference">Size price difference: Small base, Medium +$1.50, Large +$3.00</div>');
 
            
             let quantity = 1;
@@ -110,9 +114,22 @@
                 this.value = quantity;
             });
 
+            // insert options container before action buttons
+            const actionsDiv = document.getElementById('add-to-cart-btn').parentElement;
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'product-options';
+            optionsContainer.id = `options-${productId}`;
+            actionsDiv.parentElement.insertBefore(optionsContainer, actionsDiv);
+
+            // render option controls and compute price
+            if (window.foodWebsite && typeof foodWebsite.renderOptionsForProduct === 'function') {
+                foodWebsite.renderOptionsForProduct(productId);
+                foodWebsite.calculatePriceForProduct(productId);
+            }
+
             document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-                foodWebsite.addToCart(productId, quantity);
-                quantity = 1;
+                const qtyVal = Math.max(1, parseInt(document.getElementById('quantity').value) || 1);
+                foodWebsite.addToCartWithSelected(productId, qtyVal);
                 document.getElementById('quantity').value = 1;
             });
 

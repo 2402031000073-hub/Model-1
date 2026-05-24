@@ -55,8 +55,7 @@ const foodWebsite = {
   
     initFooter: function() {
         const footer = document.querySelector('footer');
-        if (!footer) {
-            const footerHTML = `
+        const footerHTML = `
                 <div class="footer-content">
                     <div class="footer-section">
                         <h3>About Us</h3>
@@ -99,26 +98,59 @@ const foodWebsite = {
                     <p>&copy; 2024 FoodHub. All rights reserved.</p>
                 </div>
             `;
+        if (footer) {
+            footer.innerHTML = footerHTML;
+        } else {
             document.body.insertAdjacentHTML('beforeend', `<footer>${footerHTML}</footer>`);
         }
     },
 
-    addToCart: function(productId, quantity = 1) {
+    addToCart: function(productId, quantity = 1, optionData = {}) {
         this.loadCart();
         const product = this.products.find(p => p.id === productId);
-        if (product) {
-            const cartItem = this.cart.find(item => item.id === productId);
-            if (cartItem) {
-                cartItem.quantity += quantity;
-                cartItem.selected = true;
-            } else {
-                this.cart.push({ ...product, quantity, selected: true });
-            }
-            this.saveCart();
-            this.showNotification('Product added to cart!', 'success');
-            return true;
+        if (!product) {
+            return false;
         }
-        return false;
+
+        const qty = Math.max(1, Number(quantity) || 1);
+        const selectedOptions = { ...optionData };
+        const customPrice = this.getProductPriceWithOptions(product, selectedOptions);
+
+        const cartItem = this.cart.find(item => item.id === productId && JSON.stringify(item.selectedOptions || {}) === JSON.stringify(selectedOptions));
+
+        if (cartItem) {
+            cartItem.quantity = Math.max(1, cartItem.quantity + qty);
+            cartItem.selected = true;
+        } else {
+            this.cart.push({
+                ...product,
+                quantity: qty,
+                selected: true,
+                price: customPrice,
+                selectedOptions
+            });
+        }
+
+        this.saveCart();
+        this.showNotification('Product added to cart!', 'success');
+        return true;
+    },
+
+    getProductPriceWithOptions: function(product, optionData) {
+        let price = Number(product.price) || 0;
+        const size = String(optionData.size || 'Small');
+        if (size === 'Medium') {
+            price += 1.50;
+        } else if (size === 'Large') {
+            price += 3.00;
+        }
+        return parseFloat(price.toFixed(2));
+    },
+
+    addToCartWithSelected: function(productId, quantity = 1) {
+        const sizeInput = document.querySelector(`input[name="product-size-${productId}"]:checked`);
+        const size = sizeInput?.value || 'Small';
+        return this.addToCart(productId, quantity, { size });
     },
 
   
@@ -173,7 +205,103 @@ const foodWebsite = {
         localStorage.setItem('foodhub_cart', JSON.stringify(this.cart));
     },
 
-   
+    addDynamicOption: function(type, label) {
+        const cleanLabel = String(label || '').trim();
+        if (!cleanLabel) {
+            this.showNotification('Enter a valid option label', 'danger');
+            return;
+        }
+
+        const containerId = type === 'checkbox' ? 'checkbox-options' : 'radio-options';
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const optionId = `${type}-option-${Date.now()}`;
+        const input = document.createElement('input');
+        input.type = type;
+        input.id = optionId;
+        input.name = type === 'radio' ? 'dynamic-radio-group' : `${type}-option`;
+        input.value = cleanLabel;
+
+        const labelEl = document.createElement('label');
+        labelEl.htmlFor = optionId;
+        labelEl.textContent = cleanLabel;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dynamic-option';
+        wrapper.appendChild(input);
+        wrapper.appendChild(labelEl);
+
+        container.appendChild(wrapper);
+        this.showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} option added`, 'success');
+    },
+
+    initDynamicOptions: function() {
+        const addBtn = document.getElementById('add-option-btn');
+        if (!addBtn) return;
+
+        addBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const text = document.getElementById('option-text')?.value;
+            const type = document.getElementById('option-type')?.value;
+            this.addDynamicOption(type, text);
+            const input = document.getElementById('option-text');
+            if (input) input.value = '';
+        });
+    },
+
+    renderOptionsForProduct: function(productId) {
+        const container = document.getElementById(`options-${productId}`);
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="product-options">
+                <h3>Choose Size</h3>
+                <div class="product-size-row">
+                    <label><input type="radio" name="product-size-${productId}" value="Small" data-price="0" checked> Small</label>
+                    <label><input type="radio" name="product-size-${productId}" value="Medium" data-price="1.50"> Medium (+$1.50)</label>
+                    <label><input type="radio" name="product-size-${productId}" value="Large" data-price="3.00"> Large (+$3.00)</label>
+                </div>
+            </div>
+        `;
+
+        const sizeInputs = container.querySelectorAll(`input[name="product-size-${productId}"]`);
+        sizeInputs.forEach(input => input.addEventListener('change', () => this.calculatePriceForProduct(productId)));
+    },
+
+    calculatePriceForProduct: function(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+
+        const selectedInput = document.querySelector(`input[name="product-size-${productId}"]:checked`);
+        const modifier = parseFloat(selectedInput?.dataset.price || '0');
+        const priceValue = parseFloat((product.price + modifier).toFixed(2));
+        const priceEl = document.getElementById(`product-price-${productId}`) || document.getElementById('product-price');
+        if (priceEl) {
+            priceEl.textContent = `$${priceValue.toFixed(2)}`;
+        }
+    },
+
+    saveCheckoutSelection: function() {
+        const selectedIds = this.getSelectedCartItems().map(item => item.id);
+        localStorage.setItem('foodhub_checkout', JSON.stringify(selectedIds));
+    },
+
+    loadCheckoutSelection: function() {
+        const saved = localStorage.getItem('foodhub_checkout');
+        if (!saved) return;
+        const selectedIds = JSON.parse(saved);
+        if (Array.isArray(selectedIds)) {
+            this.cart.forEach(item => {
+                item.selected = selectedIds.includes(item.id);
+            });
+        }
+    },
+
+    clearCheckoutSelection: function() {
+        localStorage.removeItem('foodhub_checkout');
+    },
+
     loadCart: function() {
         const saved = localStorage.getItem('foodhub_cart');
         if (saved) {
@@ -239,6 +367,7 @@ const foodWebsite = {
         localStorage.setItem('foodhub_orders', JSON.stringify(orders));
         this.cart = this.cart.filter(item => !item.selected);
         this.saveCart();
+        this.clearCheckoutSelection();
         return order;
     },
 
@@ -289,4 +418,5 @@ foodWebsite.loadCart();
 document.addEventListener('DOMContentLoaded', function() {
     foodWebsite.initHeader();
     foodWebsite.initFooter();
+    foodWebsite.initDynamicOptions();
 });

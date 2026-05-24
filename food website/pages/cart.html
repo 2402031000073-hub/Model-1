@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - FoodHub</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body>
  
@@ -17,6 +18,7 @@
                     <li><a href="category.html">Categories</a></li>
                     <li><a href="product.html">Products</a></li>
                     <li><a href="about.html">About</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
             </nav>
@@ -69,20 +71,59 @@
                     <span id="total">$0.00</span>
                 </div>
 
-                <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="checkout-btn">Proceed to Checkout</button>
+                <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="checkout-btn">Review Order</button>
                 <a href="product.html" class="btn btn-secondary" style="width: 100%; text-align: center; margin-top: 1rem; display: block;">Continue Shopping</a>
             </div>
         </div>
     </div>
 
+    <div class="modal fade" id="confirmCheckoutModal" tabindex="-1" aria-labelledby="confirmCheckoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmCheckoutModalLabel">Confirm Checkout</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>You are about to checkout the selected items. Review your totals before proceeding.</p>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Items selected</span><strong id="modal-item-count"></strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Subtotal</span><strong id="modal-subtotal"></strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Tax</span><strong id="modal-tax"></strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Delivery Fee</span><strong id="modal-delivery"></strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Total</span><strong id="modal-total"></strong>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+                        <button type="button" class="btn btn-primary" id="confirmCheckoutBtn">Confirm Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="scroll-top-btn" id="scrollTopBtn" type="button" aria-label="Scroll to top">↑</button>
+
     <footer></footer>
 
     <script src="../js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const DELIVERY_FEE = 2.99;
         const TAX_RATE = 0.10;
 
         function updateCart() {
+            foodWebsite.loadCart();
             const cartItemsContainer = document.getElementById('cart-items');
 
             if (foodWebsite.cart.length === 0) {
@@ -186,8 +227,14 @@
             updateCart();
         }
 
+        const checkoutModalElement = document.getElementById('confirmCheckoutModal');
+        const checkoutModal = typeof bootstrap !== 'undefined' ? new bootstrap.Modal(checkoutModalElement) : null;
+        const confirmCheckoutBtn = document.getElementById('confirmCheckoutBtn');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
         document.getElementById('checkout-btn').addEventListener('click', () => {
-            if (foodWebsite.getSelectedCartItems().length === 0) {
+            const selectedItems = foodWebsite.getSelectedCartItems();
+            if (selectedItems.length === 0) {
                 foodWebsite.showNotification('Please select at least one item for billing', 'danger');
                 return;
             }
@@ -196,10 +243,48 @@
                 return;
             }
 
+            const subtotal = foodWebsite.getSelectedCartTotal();
+            const tax = subtotal * TAX_RATE;
+            const delivery = selectedItems.length > 0 ? DELIVERY_FEE : 0;
+            const total = subtotal + tax + delivery;
+
+            document.getElementById('modal-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('modal-tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('modal-delivery').textContent = `$${delivery.toFixed(2)}`;
+            document.getElementById('modal-total').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('modal-item-count').textContent = `${selectedItems.length} item(s)`;
+
+            foodWebsite.saveCheckoutSelection();
+            if (checkoutModal) {
+                checkoutModal.show();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                if (confirm('Proceed to payment with selected items?')) {
+                    window.location.href = 'payment.html';
+                }
+            }
+        });
+
+        confirmCheckoutBtn.addEventListener('click', () => {
+            if (checkoutModal) {
+                checkoutModal.hide();
+            }
             window.location.href = 'payment.html';
         });
 
-       
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 250) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        foodWebsite.loadCart();
         updateCart();
     </script>
 </body>

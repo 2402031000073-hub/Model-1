@@ -30,30 +30,142 @@
     </header>
 
   
-    <div class="container">
-        
-        <div class="hero">
+    <main class="container">
+        <section class="hero">
             <div class="hero-copy">
-                <h1>Welcome to FoodHub</h1>
-                <p>Discover the best food from around the world delivered to your door</p>
-                <a href="product.html" class="btn btn-primary">Explore Now</a>
+                <span class="eyebrow">Fresh food in minutes</span>
+                <h1>FoodHub delivers joy with every bite</h1>
+                <p>Order from local favorites, discover healthy choices, and enjoy fast delivery across your city.</p>
+                <div class="hero-actions">
+                    <a href="product.html" class="btn btn-primary">Explore Menu</a>
+                    <a href="category.html" class="btn btn-secondary">Browse Categories</a>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <strong>12K+</strong>
+                        <span>happy customers</span>
+                    </div>
+                    <div>
+                        <strong>30+</strong>
+                        <span>cuisine styles</span>
+                    </div>
+                    <div>
+                        <strong>15 min</strong>
+                        <span>average delivery</span>
+                    </div>
+                </div>
             </div>
             <div class="hero-image">
                 <img src="../images/Margherita-Pizza.webp" alt="Delicious food" />
             </div>
+        </section>
+
+        <section class="features-section">
+            <div class="features-grid">
+                <article class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Speedy Delivery</h3>
+                    <p>Get your favorite meals delivered fast and fresh, exactly when you want them.</p>
+                </article>
+                <article class="feature-card">
+                    <span class="feature-icon">🥗</span>
+                    <h3>Fresh Ingredients</h3>
+                    <p>Every dish is crafted from seasonal ingredients and quality recipes.</p>
+                </article>
+                <article class="feature-card">
+                    <span class="feature-icon">🌟</span>
+                    <h3>Trusted Choices</h3>
+                    <p>Explore top-rated restaurants and popular dishes selected just for you.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2>Popular Categories</h2>
+                    <p>Hand-picked tastes for every craving.</p>
+                </div>
+            </div>
+            <div class="category-list" id="categories-container"></div>
+        </section>
+
+        <section class="section featured-section">
+            <div class="section-header">
+                <div>
+                    <h2>Featured Products</h2>
+                    <p>Our freshest menu picks for today.</p>
+                </div>
+            </div>
+            <div class="products-grid" id="featured-products"></div>
+        </section>
+
+        <section class="section option-builder-section">
+            <div class="section-header">
+                <div>
+                    <h2>Build Custom Options</h2>
+                    <p>Add a new radio or checkbox option instantly.</p>
+                </div>
+            </div>
+            <div class="option-builder">
+                <div class="option-builder-form">
+                    <input type="text" id="option-text" placeholder="Enter option label" aria-label="Option label" />
+                    <select id="option-type" aria-label="Option type">
+                        <option value="radio">Radio</option>
+                        <option value="checkbox">Checkbox</option>
+                    </select>
+                    <button id="add-option-btn" class="btn btn-primary">Add Option</button>
+                </div>
+                <div class="option-groups">
+                    <div class="option-group-card">
+                        <h3>Radio Options</h3>
+                        <div id="radio-options" class="option-group"></div>
+                    </div>
+                    <div class="option-group-card">
+                        <h3>Checkbox Options</h3>
+                        <div id="checkbox-options" class="option-group"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="newsletter-section">
+            <div class="newsletter-card">
+                <h2>Stay in the loop</h2>
+                <p>Subscribe for exclusive deals, chef specials, and new menu alerts.</p>
+                <form action="#" class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" aria-label="Email address" required />
+                    <button class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>FoodHub</h3>
+                <p>Delicious meals, fast delivery, and a menu that keeps you coming back.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="category.html">Categories</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul>
+                    <li>Email: support@foodhub.com</li>
+                    <li>Phone: +91 9023339554</li>
+                </ul>
+            </div>
         </div>
-
-       
-        <h2 style="text-align: center; margin: 2rem 0;">Popular Categories</h2>
-        <div class="category-list" id="categories-container"></div>
-
-      
-        <h2 style="text-align: center; margin: 2rem 0;">Featured Products</h2>
-        <div class="products-grid" id="featured-products"></div>
-    </div>
-
-  
-    <footer></footer>
+        <div class="footer-bottom">&copy; 2026 FoodHub. All rights reserved.</div>
+    </footer>
 
     <script src="../js/script.js"></script>
     <script>
@@ -86,6 +198,7 @@
                     <div class="product-description">${product.description}</div>
                     <div class="product-rating">⭐ ${product.rating} Rating</div>
                     <div class="product-price">$${product.price.toFixed(2)}</div>
+                    <div class="price-difference">Size: Small base, Medium +$1.50, Large +$3.00</div>
                     <div class="product-actions">
                         <button class="btn btn-primary" onclick="foodWebsite.addToCart(${product.id}); return false;">Add to Cart</button>
                         <a href="product-details.html?id=${product.id}" class="btn btn-secondary">View</a>
